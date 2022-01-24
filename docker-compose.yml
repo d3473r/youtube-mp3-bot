@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  youtube-mp3-bot:
+    build: ./
+    container_name: youtube-mp3-bot
+    environment:
+      TELEGRAM_API_TOKEN:
+    volumes:
+      - ./download:/app/download

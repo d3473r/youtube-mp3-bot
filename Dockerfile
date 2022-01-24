@@ -4,7 +4,7 @@ COPY . .
 RUN go build -o youtube-mp3-bot
 
 FROM alpine
-RUN apk --no-cache add youtube-dl ffmpeg
+RUN apk --no-cache add yt-dlp ffmpeg
 WORKDIR /app
 COPY --from=BUILD /src/youtube-mp3-bot /app/
 ENTRYPOINT ./youtube-mp3-bot

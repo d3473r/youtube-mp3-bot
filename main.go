@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-var YOUTUBE_DL = "youtube-dl"
+var YOUTUBE_DL = "yt-dlp"
 var FFMPEG = "ffmpeg"
 var PYTHON = "python"
 
@@ -82,6 +82,7 @@ func handleMessage(bot *tb.Bot, message *tb.Message) {
 		filenameFound := false
 		var response *tb.Message
 		firstResponse := true
+		lastUpdate := time.Now()
 		for scanner.Scan() {
 			line := scanner.Text()
 
@@ -93,12 +94,15 @@ func handleMessage(bot *tb.Bot, message *tb.Message) {
 					response, _ = bot.Reply(message, match[1])
 					firstResponse = false
 				} else {
-					response, _ = bot.Edit(response, match[1])
+					if time.Now().After(lastUpdate.Add(time.Second)) {
+						response, _ = bot.Edit(response, match[1])
+						lastUpdate = time.Now()
+					}
 				}
 			}
 
 			if !filenameFound {
-				re := regexp.MustCompile(`\[ffmpeg] Destination: (.*).mp3`)
+				re := regexp.MustCompile(`\[ExtractAudio] Destination: (.*).mp3`)
 				match := re.FindStringSubmatch(line)
 
 				if len(match) > 0 {
