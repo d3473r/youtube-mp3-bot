@@ -16,11 +16,10 @@ import (
 
 var YOUTUBE_DL = "yt-dlp"
 var FFMPEG = "ffmpeg"
-var PYTHON = "python"
 
 func main() {
 	if !commandExists(YOUTUBE_DL) || !commandExists(FFMPEG) {
-		log.Fatal("youtube-dl, ffmpeg and python need to be installed")
+		log.Fatal("youtube-dl and ffmpeg need to be installed")
 		return
 	}
 
@@ -62,14 +61,6 @@ func handleMessage(bot *tb.Bot, message *tb.Message) {
 	if uri.Host == "www.youtube.com" || uri.Host == "m.youtube.com" || uri.Host == "youtu.be" {
 		log.Printf("Downloading: %s for %s: %d", uri, message.Sender.FirstName, message.Sender.ID)
 
-		/*
-			re := regexp.MustCompile("/(?:youtube.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu.be/)([^\"&?/\\s]{11})")
-			match := re.FindStringSubmatch(uri.String())
-			if len(match) > 0 {
-				log.Printf("Saving video id: %s", match[1])
-			}
-		*/
-
 		cmd := exec.Command(YOUTUBE_DL, "--extract-audio", "--audio-format", "mp3", "-o", "download/%(title)s.%(ext)s", uri.String())
 
 		stdout, _ := cmd.StdoutPipe()
@@ -86,15 +77,17 @@ func handleMessage(bot *tb.Bot, message *tb.Message) {
 		for scanner.Scan() {
 			line := scanner.Text()
 
-			re := regexp.MustCompile(`\[download]  (.*)`)
+			re := regexp.MustCompile(`\[download] (.*)`)
 			match := re.FindStringSubmatch(line)
+
+			log.Printf("	%s: %s", YOUTUBE_DL, line)
 
 			if len(match) > 0 {
 				if firstResponse {
 					response, _ = bot.Reply(message, match[1])
 					firstResponse = false
 				} else {
-					if time.Now().After(lastUpdate.Add(time.Second)) {
+					if time.Now().After(lastUpdate.Add(time.Millisecond * 50)) {
 						response, _ = bot.Edit(response, match[1])
 						lastUpdate = time.Now()
 					}
