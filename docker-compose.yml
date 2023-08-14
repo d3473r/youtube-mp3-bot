@@ -4,6 +4,7 @@ services:
   youtube-mp3-bot:
     image: ghcr.io/d3473r/youtube-mp3-bot:main
     container_name: youtube-mp3-bot
+    restart: unless-stopped
     environment:
       TELEGRAM_API_TOKEN:
     volumes:
