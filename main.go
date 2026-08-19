@@ -3,8 +3,6 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"github.com/joho/godotenv"
-	tb "gopkg.in/tucnak/telebot.v2"
 	"log"
 	"net/url"
 	"os"
@@ -12,6 +10,9 @@ import (
 	"path/filepath"
 	"regexp"
 	"time"
+
+	"github.com/joho/godotenv"
+	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 var YOUTUBE_DL = "yt-dlp"
@@ -61,7 +62,7 @@ func handleMessage(bot *tb.Bot, message *tb.Message) {
 	if uri.Host == "www.youtube.com" || uri.Host == "m.youtube.com" || uri.Host == "youtu.be" {
 		log.Printf("Downloading: %s for %s: %d", uri, message.Sender.FirstName, message.Sender.ID)
 
-		cmd := exec.Command(YOUTUBE_DL, "--extract-audio", "--audio-format", "mp3", "-o", "download/%(title)s.%(ext)s", uri.String())
+		cmd := exec.Command(YOUTUBE_DL, "--extract-audio", "--audio-format", "mp3", "-o", "download/%(title)s.%(ext)s", "--extractor-args", "'youtube:player_client=android'", uri.String())
 
 		stdout, _ := cmd.StdoutPipe()
 		cmd.Start()
